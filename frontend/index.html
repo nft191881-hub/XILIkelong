@@ -1,0 +1,132 @@
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>XILIkelong</title>
+    <style>
+      body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: #0b1020;
+        color: #e5edf7;
+      }
+      .container {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 48px 20px;
+      }
+      .card {
+        background: #121a2a;
+        border: 1px solid #23314d;
+        border-radius: 16px;
+        padding: 24px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      }
+      h1 {
+        margin-top: 0;
+      }
+      label {
+        display: block;
+        margin-top: 16px;
+        margin-bottom: 8px;
+        font-weight: 600;
+      }
+      textarea, input {
+        width: 100%;
+        padding: 12px 14px;
+        border-radius: 10px;
+        border: 1px solid #2d3d5d;
+        background: #0d1629;
+        color: #edf4ff;
+        box-sizing: border-box;
+      }
+      textarea {
+        min-height: 150px;
+        resize: vertical;
+      }
+      button {
+        margin-top: 16px;
+        background: #4f8cff;
+        border: none;
+        color: white;
+        padding: 12px 18px;
+        border-radius: 10px;
+        cursor: pointer;
+        font-size: 15px;
+      }
+      button:hover {
+        background: #3f7af0;
+      }
+      .result {
+        margin-top: 24px;
+        background: #0d1629;
+        padding: 16px;
+        border-radius: 10px;
+        border: 1px solid #264166;
+        white-space: pre-wrap;
+        word-break: break-word;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="card">
+        <h1>XILIkelong</h1>
+        <p>Public stack inference from URLs, snippets, and code fragments.</p>
+
+        <label for="url">URL</label>
+        <input id="url" type="text" placeholder="https://example.com" />
+
+        <label for="snippet">Code snippet</label>
+        <textarea id="snippet" placeholder="Paste code or text here..."></textarea>
+
+        <button id="submit">Infer Stack</button>
+
+        <div id="result" class="result">Result will appear here...</div>
+      </div>
+    </div>
+
+    <script>
+      const submitBtn = document.getElementById('submit');
+      const resultBox = document.getElementById('result');
+      const urlInput = document.getElementById('url');
+      const snippetInput = document.getElementById('snippet');
+
+      submitBtn.addEventListener('click', async () => {
+        const url = urlInput.value.trim();
+        const snippet = snippetInput.value.trim();
+
+        if (!url && !snippet) {
+          resultBox.textContent = 'Please provide a URL or a code snippet.';
+          return;
+        }
+
+        try {
+          resultBox.textContent = 'Analyzing...';
+
+          let endpoint = '';
+          let payload = {};
+
+          if (url) {
+            endpoint = 'https://xilikelong-api.onrender.com/infer/url';
+            payload = { url };
+          } else {
+            endpoint = 'https://xilikelong-api.onrender.com/infer/text';
+            payload = { text: snippet };
+          }
+
+          const res = await fetch(endpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+
+          const data = await res.json();
+          resultBox.textContent = JSON.stringify(data, null, 2);
+        } catch (err) {
+          resultBox.textContent = 'Request failed: ' + err.message;
+        }
+      });
+    </script>
+  </body>
+</html>
